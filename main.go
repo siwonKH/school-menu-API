@@ -92,12 +92,12 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 
 	// Search menu
 	menuData := request.SearchMenu(schoolData.AptCode, schoolData.SchoolCode, date)
+	menuData.Status.SchoolAptName = schoolData.AptName
 	if searchCnt > 1 {
 		menuData.Status.Msg += " | 학교가 두 개 이상 검색되었습니다. /[학교명]/" + dateStr + "/[교육청코드] 로 다른학교도 검색해보세요. 교육청코드(apt_code)는 /school/[학교명] 에서 확인할 수 있습니다"
 	}
 	if menuData.Status.Success == false {
 		menuData.Status.SearchedSchool = schoolData.SchoolName
-		menuData.Status.SchoolAptName = schoolData.AptName
 		//return c.JSON(menuData)
 	}
 	//Search menu Done
