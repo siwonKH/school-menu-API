@@ -82,6 +82,8 @@ https://scmeal.ml/경북소
 }
 ```
 ### 학교 검색 응답
+학교 검색은 결과가 10개까지 나옵니다
+
 요청:
 ```
 https://scmeal.ml/school/경북소
