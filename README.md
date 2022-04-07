@@ -26,6 +26,9 @@ https://scmeal.ml/school/[학교명]
 ```
 https://scmeal.ml/경북소/today/[교육청코드 (예시: R10)]
 ```
+```
+https://scmeal.ml/경북소/20220103/[교육청코드 (예시: R10)]
+```
 응답 형식
 ---
 
