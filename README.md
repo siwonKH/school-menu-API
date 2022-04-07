@@ -51,13 +51,19 @@ https://scmeal.ml/경북소
   "breakfast": [
     "쌀밥(조)",
     ...
+    ...
+    ...
   ],
   "lunch": [
     "쌀밥(조)",
     ...
+    ...
+    ...
   ],
   "dinner": [
     "발아현미밥",
+    ...
+    ...
     ...
   ]
 }
@@ -77,6 +83,8 @@ https://scmeal.ml/경북소
   "lunch": [
     "찹쌀밥",
     ...
+    ...
+    ...
   ],
   "dinner": null
 }
@@ -86,7 +94,7 @@ https://scmeal.ml/경북소
 
 요청:
 ```
-https://scmeal.ml/school/경북소
+https://scmeal.ml/school/장곡중
 ```
 응답:
 ```
@@ -94,17 +102,23 @@ https://scmeal.ml/school/경북소
   "status": {
     "success": true,
     "msg": "success",
-    "server_date": "2022-01-03",
-    "searched_school": "경북소프트웨어고등학교",
+    "server_date": "2022-04-07",
+    "searched_school": "장곡중학교",
     "school_apt_name": ""
   },
   "list": [
     {
+      "apt_code": "J10",
+      "apt_name": "경기도교육청",
+      "school_code": "7781013",
+      "school_name": "장곡중학교"
+    },
+    {
       "apt_code": "R10",
       "apt_name": "경상북도교육청",
-      "school_code": "8750767",
-      "school_name": "경북소프트웨어고등학교"
-    },
+      "school_code": "8941068",
+      "school_name": "장곡중학교"
+    }
   ]
 }
 ```
