@@ -78,10 +78,11 @@ func SearchSchool(schoolName string) apiResponse.School {
 
 func stripNums(menuList []string) []string {
 	for i := 0; i < len(menuList); i++ {
-		if strings.Contains(menuList[i], ".") {
-			menuList[i] = menuList[i][:strings.Index(menuList[i], ".")-1]
-			menuList[i] = strings.Replace(menuList[i], "1", "", -1)
-		}
+		//if strings.Contains(menuList[i], ".") {
+		//	menuList[i] = menuList[i][:strings.Index(menuList[i], ".")-1]
+		//	menuList[i] = strings.Replace(menuList[i], "1", "", -1)
+		//}
+		menuList[i] = strings.Split(menuList[i], " (")[0]
 	}
 	return menuList
 }
