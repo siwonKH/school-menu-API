@@ -10,6 +10,7 @@ import (
 	"schoolMenuApi/model/apiResponse"
 	"schoolMenuApi/request"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -25,7 +26,26 @@ type RecentSchool struct {
 
 // Cache in RAM!! wow
 var recentSchoolsSize = 100
-var recentSchools [101]RecentSchool
+
+type Cache struct {
+	sync.RWMutex
+	recentSchools [101]RecentSchool
+}
+
+func (m *Cache) Get() [101]RecentSchool {
+	m.RLock()
+	defer m.RUnlock()
+	return m.recentSchools
+}
+
+func (m *Cache) Set(recentSchool [101]RecentSchool) {
+	m.Lock()
+	m.recentSchools = recentSchool
+	m.Unlock()
+}
+
+var recentSchools = &Cache{}
+
 var recentSchoolsCnt = -1
 
 //var recentSchoolsTomorrow [101]RecentSchool
@@ -65,7 +85,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 
 	// Cache
 	for i := 0; i < recentSchoolsSize; i++ {
-		school := recentSchools[i]
+		school := recentSchools.Get()[i]
 		if strings.Contains(school.SchoolName, decodedSchoolName) && (school.Num == num || num == "") && school.Date == date {
 			log.Printf("Cached in %s", school.SchoolName)
 			school.MenuData.Status.Msg += " | Cached"
@@ -108,7 +128,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 
 	// Cache school data
 	recentSchoolsCnt += 1
-	if recentSchoolsCnt >= len(recentSchools) {
+	if recentSchoolsCnt >= len(recentSchools.Get()) {
 		recentSchoolsCnt = -1
 	}
 	var savingSchool RecentSchool
@@ -119,7 +139,9 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	savingSchool.SchoolCode = schoolData.SchoolCode
 	savingSchool.Num = num
 	savingSchool.Date = date
-	recentSchools[recentSchoolsCnt] = savingSchool
+	savingRecent := recentSchools.Get()
+	savingRecent[recentSchoolsCnt] = savingSchool
+	recentSchools.Set(savingRecent)
 
 	log.Printf("Searched in %s", schoolName)
 	return c.JSON(menuData)
@@ -186,8 +208,8 @@ func main() {
 	// Cache List
 	app.Get("/stat", func(c *fiber.Ctx) error {
 		schools := ""
-		for i := 0; i < len(recentSchools); i++ {
-			schools += recentSchools[i].SchoolName + "\n"
+		for i := 0; i < len(recentSchools.Get()); i++ {
+			schools += recentSchools.Get()[i].SchoolName + "\n"
 		}
 		return c.SendString(schools)
 	})
