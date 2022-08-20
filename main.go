@@ -174,17 +174,14 @@ func main() {
 		},
 	}))
 
-	app.Static("/", "../schoolMenuAPi")
+	app.Static("/static", "../schoolMenuApi/static")
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendFile("index.html")
+		return c.SendFile("/static/index.html")
 	})
 
-	app.Get("favicon.ico", func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotFound)
-	})
 	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotFound)
+		return c.SendFile("/static/favicon.ico")
 	})
 
 	//s1 := gocron.NewScheduler()
