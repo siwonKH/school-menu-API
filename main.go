@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/go-co-op/gocron"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"log"
 	"net/url"
 	"schoolMenuApi/model/apiResponse"
@@ -16,6 +17,7 @@ type RecentSchool struct {
 	Num        string
 	SchoolName string
 	AptCode    string
+	AptName    string
 	SchoolCode string
 	Date       string
 	MenuData   apiResponse.Menu
@@ -25,29 +27,30 @@ type RecentSchool struct {
 var recentSchoolsSize = 100
 var recentSchools [101]RecentSchool
 var recentSchoolsCnt = -1
-var recentSchoolsTomorrow [101]RecentSchool
 
-func prepareTomorrow() {
-	log.Println("Starting cache renew and save")
-	tomorrow := time.Now().Add(time.Hour * 23).Format("20060102")
-	for i := 0; i < recentSchoolsSize; i++ {
-		start := time.Now()
-		MenuData := request.SearchMenu(recentSchools[i].AptCode, recentSchools[i].SchoolCode, tomorrow)
-		recentSchoolsTomorrow[i] = recentSchools[i]
-		recentSchoolsTomorrow[i].MenuData = MenuData
-		recentSchoolsTomorrow[i].Date = tomorrow
-		elapsed := time.Since(start)
-		log.Printf("Saved %s in %s", recentSchools[i].SchoolName, elapsed)
-		time.Sleep(1 * time.Second)
-	}
-	log.Println("Done")
-}
+//var recentSchoolsTomorrow [101]RecentSchool
 
-func setTomorrowCache() {
-	time.Sleep(59*time.Second + 500)
-	recentSchools = recentSchoolsTomorrow
-	log.Println("copied 'recentSchoolsTomorrow' to 'recentSchools'")
-}
+//func prepareTomorrow() {
+//	log.Println("Starting cache renew and save")
+//	tomorrow := time.Now().Add(time.Hour * 23).Format("20060102")
+//	for i := 0; i < recentSchoolsSize; i++ {
+//		start := time.Now()
+//		MenuData := request.SearchMenu(recentSchools[i].AptCode, recentSchools[i].SchoolCode, tomorrow)
+//		recentSchoolsTomorrow[i] = recentSchools[i]
+//		recentSchoolsTomorrow[i].MenuData = MenuData
+//		recentSchoolsTomorrow[i].Date = tomorrow
+//		elapsed := time.Since(start)
+//		log.Printf("Saved %s in %s", recentSchools[i].SchoolName, elapsed)
+//		time.Sleep(1 * time.Second)
+//	}
+//	log.Println("Done")
+//}
+
+//func setTomorrowCache() {
+//	time.Sleep(59*time.Second + 500)
+//	recentSchools = recentSchoolsTomorrow
+//	log.Println("copied 'recentSchoolsTomorrow' to 'recentSchools'")
+//}
 
 func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string, num string, c *fiber.Ctx) error {
 	// Core process start //
@@ -65,6 +68,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 		school := recentSchools[i]
 		if strings.Contains(school.SchoolName, decodedSchoolName) && (school.Num == num || num == "") && school.Date == date {
 			log.Printf("Cached in %s", school.SchoolName)
+			school.MenuData.Status.Msg += " | Cached"
 			response := school.MenuData
 			return c.JSON(response)
 		}
@@ -111,6 +115,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	savingSchool.MenuData = menuData
 	savingSchool.SchoolName = schoolData.SchoolName
 	savingSchool.AptCode = schoolData.AptCode
+	savingSchool.AptName = schoolData.AptName
 	savingSchool.SchoolCode = schoolData.SchoolCode
 	savingSchool.Num = num
 	savingSchool.Date = date
@@ -131,25 +136,23 @@ func main() {
 		EnableTrustedProxyCheck: true,
 	})
 
-	s1 := gocron.NewScheduler(time.Local)
-	s1.Every(1).Day().At("23:00").Do(prepareTomorrow)
-	s1.Every(1).Day().At("23:59").Do(setTomorrowCache)
-	s1.StartAsync()
+	app.Use(cors.New())
+	app.Use(logger.New())
 
-	// 1분에 100번 요청가능
+	// 1분에 20번 요청가능
 	app.Use(limiter.New(limiter.Config{
-		Max:        30,
+		Max:        20,
 		Expiration: 1 * time.Minute,
 		KeyGenerator: func(c *fiber.Ctx) string {
-			log.Printf(c.IP())
 			log.Printf(c.Get("x-forwarded-for"))
-			//return c.IP()
 			return c.Get("x-forwarded-for")
 		},
 		LimitReached: func(c *fiber.Ctx) error {
 			return c.SendStatus(fiber.StatusTooManyRequests)
 		},
 	}))
+
+	app.Static("/", "../schoolMenuAPi")
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendFile("index.html")
@@ -161,6 +164,24 @@ func main() {
 	app.Get("/favicon.ico", func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotFound)
 	})
+
+	//s1 := gocron.NewScheduler()
+	//s2 := gocron.NewScheduler()
+	//log.Println("Starting Service")
+	//
+	//s1.Clear()
+	//s2.Clear()
+	//
+	//err := s1.Every(1).Day().At("23:00").Lock().Do(prepareTomorrow)
+	//if err != nil {
+	//	return
+	//}
+	//err = s2.Every(1).Day().At("23:59").Lock().Do(setTomorrowCache)
+	//if err != nil {
+	//	return
+	//}
+	//s1.Start()
+	//s2.Start()
 
 	// Cache List
 	app.Get("/stat", func(c *fiber.Ctx) error {
