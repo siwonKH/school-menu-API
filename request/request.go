@@ -31,6 +31,7 @@ func SuccessResponse(searchedSchool string) model.Default {
 	response.Msg = "success"
 	response.ServerDate = time.Now().Format("2006-01-02")
 	response.SearchedSchool = searchedSchool
+	response.SchoolAptName = "-"
 	return response
 }
 
