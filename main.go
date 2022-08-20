@@ -22,6 +22,7 @@ type RecentSchool struct {
 	SchoolCode string
 	Date       string
 	MenuData   apiResponse.Menu
+	Searched   string
 }
 
 // Cache in RAM!! wow
@@ -86,7 +87,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	// Cache
 	for i := 0; i < recentSchoolsSize; i++ {
 		school := recentSchools.Get()[i]
-		if strings.Contains(school.SchoolName, decodedSchoolName) && (school.Num == num || num == "") && school.Date == date {
+		if strings.Contains(decodedSchoolName, school.Searched) && (school.Num == num || num == "") && school.Date == date {
 			log.Printf("Cached in %s", school.SchoolName)
 			school.MenuData.Status.Msg += " | Cached"
 			response := school.MenuData
@@ -139,6 +140,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	savingSchool.SchoolCode = schoolData.SchoolCode
 	savingSchool.Num = num
 	savingSchool.Date = date
+	savingSchool.Searched = decodedSchoolName
 	savingRecent := recentSchools.Get()
 	savingRecent[recentSchoolsCnt] = savingSchool
 	recentSchools.Set(savingRecent)
