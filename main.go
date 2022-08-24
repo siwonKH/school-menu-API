@@ -87,7 +87,7 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	// Cache
 	for i := 0; i < recentSchoolsSize; i++ {
 		school := recentSchools.Get()[i]
-		if strings.Contains(decodedSchoolName, school.Searched) && (school.Num == num || num == "") && school.Date == date {
+		if (strings.Contains(decodedSchoolName, school.Searched)) && (school.Num == num || num == "") && school.Date == date {
 			log.Printf("Cached in %s", school.SchoolName)
 			school.MenuData.Status.Msg += " | Cached"
 			response := school.MenuData
@@ -128,6 +128,12 @@ func apiMainProcess(schoolName string, decodedSchoolName string, dateStr string,
 	//Search menu Done
 
 	// Cache school data
+	if searchCnt > 1 {
+		// don't save cache
+		log.Printf("Searched in %s", schoolName)
+		return c.JSON(menuData)
+	}
+
 	recentSchoolsCnt += 1
 	if recentSchoolsCnt >= len(recentSchools.Get()) {
 		recentSchoolsCnt = -1
