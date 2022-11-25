@@ -1,5 +1,5 @@
 # schoolMenu-API
-school menu api - /[학교명] 으로 심플하고 빠른 급식 API  
+school menu api - 심플하고 빠른 급식 API  
 
 ## 빠른 사용법
 오늘의 메뉴를 불러옵니다.
