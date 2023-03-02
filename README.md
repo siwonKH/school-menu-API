@@ -5,26 +5,26 @@ school menu api - 심플하고 빠른 급식 API
 오늘의 메뉴를 불러옵니다.
 > ###### 학교명은 3글자 이상 입력하는 것을 추천합니다. 
 ```
-https://scmeal.ml/경북소프트웨어고
+https://ml.siwonkh.com/경북소프트웨어고
 ```
 
 ## 추가 사용법
 
 ### 특정 날짜의 급식 가져오기
 ```
-https://scmeal.ml/경북소/20220103
+https://ml.siwonkh.com/경북소/20220103
 ```
 ### 같은 이름의 학교가 여러개일 때
 아래 주소로 학교를 검색하여 원하는 학교의 교육청코드(apt_code)를 찾습니다. (JSON beautifier 사용추천..)
 ```
-https://scmeal.ml/school/[학교명]
+https://ml.siwonkh.com/school/[학교명]
 ```
 그리고 다음과 같은 형식으로 오늘의 급식을 불러올 수 있습니다.
 ```
-https://scmeal.ml/경북소/today/[교육청코드 (예시: R10)]
+https://ml.siwonkh.com/경북소/today/[교육청코드 (예시: R10)]
 ```
 ```
-https://scmeal.ml/경북소/20220103/[교육청코드 (예시: R10)]
+https://ml.siwonkh.com/경북소/20220103/[교육청코드 (예시: R10)]
 ```
 응답 형식
 ---
@@ -32,7 +32,7 @@ https://scmeal.ml/경북소/20220103/[교육청코드 (예시: R10)]
 ### 급식 검색 형식
 요청:
 ```
-https://scmeal.ml/경북소
+https://ml.siwonkh.com/경북소
 ```
 응답 (검색된 학교가 하나일때):
 ```
@@ -91,7 +91,7 @@ https://scmeal.ml/경북소
 
 요청:
 ```
-https://scmeal.ml/school/장곡중
+https://ml.siwonkh.com/school/장곡중
 ```
 응답:
 ```
